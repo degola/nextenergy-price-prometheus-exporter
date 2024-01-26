@@ -1,0 +1,8 @@
+services:
+  nextenergy-price-prometheus-exporter:
+    build: ./
+    ports:
+      - "8989:8989"
+    restart: unless-stopped
+    environment:
+      - HTTP_PORT=8989
