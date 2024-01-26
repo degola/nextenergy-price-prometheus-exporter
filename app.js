@@ -222,6 +222,6 @@ const server = http.createServer(async (req, res) => {
     }
 })
 // Start the HTTP server which exposes the metrics on http://localhost:8080/metrics
-server.listen(8080)
+server.listen(HTTP_PORT)
 
 console.log(new Date(), `server listening to ${HTTP_PORT}, metrics exposed on http://0.0.0.0:${HTTP_PORT}/metrics`)
