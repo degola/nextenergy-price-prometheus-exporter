@@ -7,11 +7,137 @@ const register = new client.Registry()
 
 async function collectElectricityPrice() {
     // next energy is a dutch electricity provider, let's use Amsterdam timezone
-    const ams_date_string = new Date().toLocaleString('en-US', { timeZone: 'Europe/Amsterdam' })
-    const date_amsterdam = new Date(ams_date_string)
-    const currentHour = date_amsterdam.getHours()
-
     return new Promise(async (resolve, reject) => {
+        const ams_date_string = new Date().toLocaleString('en-US', { timeZone: 'Europe/Amsterdam' })
+        const date_amsterdam = new Date(ams_date_string)
+        const currentHour = date_amsterdam.getHours()
+        const priceDate = [date_amsterdam.getFullYear(), ("" + date_amsterdam.getMonth() + 1).padStart(2, '0'), date_amsterdam.getDate()].join('-')
+
+        const nextEnergyBody = {
+            versionInfo: {
+                // it seems to be just an internal hash of deploy versions, so we can just hardcode it and see what happens...
+                moduleVersion: "GArkw9ah6WKj1Qy4h5mAsQ",
+                apiVersion: "Bc8_XAfp3W7kn4dKB4nXdg"
+            },
+            viewName: "MainFlow.MarketPrices",
+            "screenData":{
+                variables: {
+                    Graphsize:348,
+                    Filter_CurrentHour: currentHour,
+                    Filter_PriceDate: priceDate,
+                    Filter_CostsLevelId: 3,
+                    IsOpenPopup: false,
+                    HighchartsJSON: JSON.stringify({
+                        chart: {
+                            zoomType: 'x',
+                            panning: true,
+                            panKey: 'shift',
+                            style: {
+                                fontFamily: 'Roobert, sans-serif'
+                            }
+                        },
+
+                        xAxis: {categories:  ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09'],
+                            tickInterval: 2,
+                            lineColor: 'none',
+                            gridLineColor: '#CECECE',
+                            gridLineWidth: 0.5,
+                            tickWidth: 0.5,
+                            tickLength: 30,
+                            tickColor: '#CECECE',
+                            opposite: true,
+                            title: {
+                                margin: 5,
+                                style: {
+                                    color: '#888888',
+                                    fontSize: '1em'
+                                }
+                            },
+                            labels: {
+                                align: 'left',
+                                rotation: 0,
+                                x: 3,
+                                y: -18,
+                                style: {
+                                    color: '#888888',
+                                    fontSize: '1em'
+                                }
+                            }, plotLines: [{
+                                color: '#00BA85',
+                                width: 1,
+                                value:4},{
+                                color: '#00BA85',
+                                width: 1,
+                                value:6},{
+                                color: '#00BA85',
+                                width: 1,
+                                value:13},{
+                                color: '#00BA85',
+                                width: 1,
+                                value:16},],
+                            plotBands: [{
+                                color: {
+                                    linearGradient: { x1: 1, y1: 0, x2: 1, y2: 1 },
+                                    stops: [
+                                        [0, 'rgba(153, 227, 206, 0)'],
+                                        [1, 'rgba(153, 227, 206, 0.6)']
+                                    ]
+                                },
+                                from: 4,
+                                to: 6,
+                            },{
+                                color: {
+                                    linearGradient: { x1: 1, y1: 0, x2: 1, y2: 1 },
+                                    stops: [
+                                        [0, 'rgba(153, 227, 206, 0)'],
+                                        [1, 'rgba(153, 227, 206, 0.6)']
+                                    ]
+                                },
+                                from: 13,
+                                to: 16,
+                            },]
+                        },
+
+                        yAxis: {
+                            plotLines: [{
+                                color: '#CECECE',
+                                width: 0.5,
+                                value: 0
+                            }],
+                            tickLength: 0,tickInterval:  0.1,
+                            lineColor: 'none',
+                            gridLineColor: 'none',
+                            gridLineWidth: 0,
+                            title: {
+                                margin: 5,
+                                style: {
+                                    color: '#888888',
+                                    fontSize: '1em'
+                                }
+                            },
+                            labels: {
+                                style: {
+                                    color: '#888888',
+                                    fontSize: '1em'
+                                }
+                            }
+                        },
+
+                        plotOptions: {
+                            series: {borderRadius:  15
+                            },
+                            column: {pointPlacement:  'between',
+                                maxPointWidth: 30, groupPadding: 0
+                            }
+                        }
+                    }).replace(/^{|}$/g, ''),
+                    IsDesktop: false,
+                    IsLoading: true,
+                    IsOpenPopup: false,
+                    IsTablet: false
+                }
+            }
+        }
         fetch("https://mijn.nextenergy.nl/Website_CW/screenservices/Website_CW/MainFlow/WB_EnergyPrices/DataActionGetDataPoints", {
             "headers": {
                 "accept": "application/json",
@@ -31,131 +157,7 @@ async function collectElectricityPrice() {
                 "Referrer-Policy": "strict-origin-when-cross-origin",
                 "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             },
-            "body": JSON.stringify({
-                versionInfo: {
-                    // it seems to be just an internal hash of deploy versions, so we can just hardcode it and see what happens...
-                    moduleVersion: "GArkw9ah6WKj1Qy4h5mAsQ",
-                    apiVersion: "Bc8_XAfp3W7kn4dKB4nXdg"
-                },
-                viewName: "MainFlow.MarketPrices",
-                "screenData":{
-                    variables: {
-                        Graphsize:348,
-                        Filter_CurrentHour: currentHour,
-                        Filter_PriceDate: [date_amsterdam.getFullYear(), date_amsterdam.getMonth() + 1, date_amsterdam.getDay()].join('-'),
-                        Filter_CostsLevelId: 3,
-                        IsOpenPopup: false,
-                        HighchartsJSON: JSON.stringify({
-                            chart: {
-                                zoomType: 'x',
-                                panning: true,
-                                panKey: 'shift',
-                                style: {
-                                    fontFamily: 'Roobert, sans-serif'
-                                }
-                            },
-
-                            xAxis: {categories:  ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09'],
-                                tickInterval: 2,
-                                lineColor: 'none',
-                                gridLineColor: '#CECECE',
-                                gridLineWidth: 0.5,
-                                tickWidth: 0.5,
-                                tickLength: 30,
-                                tickColor: '#CECECE',
-                                opposite: true,
-                                title: {
-                                    margin: 5,
-                                    style: {
-                                        color: '#888888',
-                                        fontSize: '1em'
-                                    }
-                                },
-                                labels: {
-                                    align: 'left',
-                                    rotation: 0,
-                                    x: 3,
-                                    y: -18,
-                                    style: {
-                                        color: '#888888',
-                                        fontSize: '1em'
-                                    }
-                                }, plotLines: [{
-                                    color: '#00BA85',
-                                    width: 1,
-                                    value:4},{
-                                    color: '#00BA85',
-                                    width: 1,
-                                    value:6},{
-                                    color: '#00BA85',
-                                    width: 1,
-                                    value:13},{
-                                    color: '#00BA85',
-                                    width: 1,
-                                    value:16},],
-                                plotBands: [{
-                                    color: {
-                                        linearGradient: { x1: 1, y1: 0, x2: 1, y2: 1 },
-                                        stops: [
-                                            [0, 'rgba(153, 227, 206, 0)'],
-                                            [1, 'rgba(153, 227, 206, 0.6)']
-                                        ]
-                                    },
-                                    from: 4,
-                                    to: 6,
-                                },{
-                                    color: {
-                                        linearGradient: { x1: 1, y1: 0, x2: 1, y2: 1 },
-                                        stops: [
-                                            [0, 'rgba(153, 227, 206, 0)'],
-                                            [1, 'rgba(153, 227, 206, 0.6)']
-                                        ]
-                                    },
-                                    from: 13,
-                                    to: 16,
-                                },]
-                            },
-
-                            yAxis: {
-                                plotLines: [{
-                                    color: '#CECECE',
-                                    width: 0.5,
-                                    value: 0
-                                }],
-                                tickLength: 0,tickInterval:  0.1,
-                                lineColor: 'none',
-                                gridLineColor: 'none',
-                                gridLineWidth: 0,
-                                title: {
-                                    margin: 5,
-                                    style: {
-                                        color: '#888888',
-                                        fontSize: '1em'
-                                    }
-                                },
-                                labels: {
-                                    style: {
-                                        color: '#888888',
-                                        fontSize: '1em'
-                                    }
-                                }
-                            },
-
-                            plotOptions: {
-                                series: {borderRadius:  15
-                                },
-                                column: {pointPlacement:  'between',
-                                    maxPointWidth: 30, groupPadding: 0
-                                }
-                            }
-                        }).replace(/^{|}$/g, ''),
-                        IsDesktop: false,
-                        IsLoading: true,
-                        IsOpenPopup: false,
-                        IsTablet: false
-                    }
-                }
-            }),
+            "body": JSON.stringify(nextEnergyBody),
             method: "POST"
         })
             .then(response => response.json())
