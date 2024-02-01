@@ -11,7 +11,11 @@ async function collectElectricityPrice() {
         const ams_date_string = new Date().toLocaleString('en-US', { timeZone: 'Europe/Amsterdam' })
         const date_amsterdam = new Date(ams_date_string)
         const currentHour = date_amsterdam.getHours()
-        const priceDate = [date_amsterdam.getFullYear(), ("" + date_amsterdam.getMonth() + 1).padStart(2, '0'), date_amsterdam.getDate()].join('-')
+        const priceDate = [
+            date_amsterdam.getFullYear(),
+            ("" + (parseInt(date_amsterdam.getMonth()) + 1)).padStart(2, '0'),
+            ("" + date_amsterdam.getDate()).padStart(2, '0')
+        ].join('-')
 
         const nextEnergyBody = {
             versionInfo: {
